@@ -1,0 +1,21 @@
+[Unit]
+Description=OpenERP server
+Requires=postgresql.target
+After=syslog.target network.target
+
+
+[Service]
+User=openerp
+Group=openerp
+
+ExecStart=/usr/bin/python2 /opt/openerp/openerp_server/openerp-server -c /etc/openerp-server.conf
+ExecStop=kill -SIGINT $MAINPID
+ExecReload=kill -HUP $MAINPID
+SuccessExitStatus=30
+Restart=always
+Type=simple
+StandarError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
