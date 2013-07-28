@@ -173,9 +173,9 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
 
     @openerp.addons.web.http.jsonrequest
     def open_cashbox(self, request):
-        self._read_config('printer')
-        device = printer.Usb(self.idVendor, self.idProduct, self.interface, self.in_ep, self.out_ep)
-        device.cashdraw(2)
+        #print 'open_cashbox'
+        self._init_printer()
+        self.printer.cashdraw(2)
         return
 
     @openerp.addons.web.http.jsonrequest
@@ -183,6 +183,7 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
         """
         The user send a receipt to print
         """
+        #print 'print_receipt'
         self._print_receipt(receipt)
         return
 
@@ -192,18 +193,12 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
         return
 
     def _print_receipt(self, receipt):
+        self._init_printer() 
         path = os.path.dirname(__file__)
-        config = self._read_config('printer')
+
         filename = path + '/logo.jpg'
-        #template = path + self._read_config('template')['file']
         
-        self.device = printer.Usb(int(config['idvendor'], 16), 
-                             int(config['idproduct'], 16), 
-                             int(config['interface'], 16), 
-                             int(config['in_ep'], 16), 
-                             int(config['out_ep'], 16))
-        
-        self.device.pxWidth = 206
+        self.printer.pxWidth = 206
         
         self._printImgFromFile(filename)
         
@@ -251,42 +246,40 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
         self._write('GRACIAS POR SU COMPRA', '', 'center')
         self._lineFeedCut(1, True)
                 
-    def _read_config(self, section):
+    def _init_printer(self):
         parser = SafeConfigParser()
         path = os.path.dirname(__file__)
         parser.read(path + '/devices.cfg')
         
         for section_name in parser.sections():
-            if section_name == section:
+            if section_name == 'printer':
                 config = {}
                 for name, value in parser.items(section_name):
                     config[name] = value
 
-        return config
+        if not hasattr(self, 'printer'):
+            self.printer = printer.Usb(int(config['idvendor'], 16), 
+                                       int(config['idproduct'], 16))
     
     # Helper functions to facilitate printing
-    def _format_date(self, date):
-        # Make string all dict
-        #for key in date.keys:
-        #    date[key] = str(date[key])
-            
+    def _format_date(self, date):            
         string = str(date['date'])+'/'+str(date['month'])+'/'+str(date['year'])+' '+str(date['hour'])+':'+"%02d" % date['minute']
         return string
         
     def _write(self, string, rcolStr=None, align="left"):
         """Write simple text string. Remember \n for newline where applicable.
         rcolStr is a righthand column that may be added (e.g. a price on a receipt). Be aware that when rcolStr is used newline(s) may only be a part of rcolStr, and only as the last character(s)."""
-        if align != "left" and len(string) < self.device.width:
+        if align != "left" and len(string) < self.printer.width:
             blanks = 0
             if align == "right":
-                blanks = self.device.width - len(string.rstrip("\n"))
+                blanks = self.printer.width - len(string.rstrip("\n"))
             if align == "center":
-                blanks = ( self.device.width - len(string.rstrip("\n")) ) / 2
+                blanks = ( self.printer.width - len(string.rstrip("\n")) ) / 2
             string = " " * blanks + string
                 
         if not rcolStr:
             try:
-                self.device.text(str(string))
+                self.printer.text(str(string))
             except:
                 print 'No pude escribir'
                 raise
@@ -295,16 +288,16 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
             if "\n" in string or "\n" in rcolStrRstripNewline:
                 raise ValueError("When using rcolStr in POSprinter.write only newline at the end of rcolStr is allowed and not in string (the main text string) it self.")
             # expand string
-            lastLineLen = len(string)%self.device.width + len(rcolStrRstripNewline)
-            if lastLineLen > self.device.width:
-                numOfBlanks = ( self.device.width - lastLineLen ) % self.device.width
+            lastLineLen = len(string)%self.printer.width + len(rcolStrRstripNewline)
+            if lastLineLen > self.printer.width:
+                numOfBlanks = ( self.printer.width - lastLineLen ) % self.printer.width
                 string += numOfBlanks * " "
-                lastLineLen = len(string)%self.device.width + len(rcolStrRstripNewline)
-            if lastLineLen < self.device.width:
-                numOfBlanks = self.device.width - lastLineLen
+                lastLineLen = len(string)%self.printer.width + len(rcolStrRstripNewline)
+            if lastLineLen < self.printer.width:
+                numOfBlanks = self.printer.width - lastLineLen
                 string += " " * numOfBlanks
             try:
-                self.device.text(string + rcolStr)
+                self.printer.text(string + rcolStr)
             except:
                 raise
     
@@ -312,13 +305,13 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
         """Write newlines and optional cut paper"""
         while times:
             try:
-                self.device.text("\n")
+                self.printer.text("\n")
             except:
                 raise
             times -= 1
         if cut:
             try:
-                self.device.cut('part')
+                self.printer.cut('part')
             except:
                 raise
     
@@ -331,17 +324,17 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
     
     def _font(self, font = 'a'):
         if font == 'a':
-            self.device._raw('\x1b\x4d\x01')
-            self.device.width = 42
+            self.printer._raw('\x1b\x4d\x01')
+            self.printer.width = 42
         else:
-            self.device._raw('\x1b\x4d\x00')
-            self.device.width = 32
+            self.printer._raw('\x1b\x4d\x00')
+            self.printer.width = 32
             
     def _bold(self, bold = True):
         if bold:
-            self.device._raw('\x1b\x45\x01')
+            self.printer._raw('\x1b\x45\x01')
         else:
-            self.device._raw('\x1b\x45\x00')
+            self.printer._raw('\x1b\x45\x00')
             
     def _decimal(self, number):
         return "%0.2f" % int(number)
@@ -368,7 +361,7 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
                 if scale > 1.0 or scale <= 0.0:
                     raise ValueError, "scale: Scaling factor must be larger than 0.0 and maximum 1.0"
                 # Give a consistent output regardless of the resolution setting
-                scale *= self.device.pxWidth/float(imgObject.size[0])
+                scale *= self.printer.pxWidth/float(imgObject.size[0])
                 if resolution is "high":
                     scaleTuple = (  scale * 2, scale * 2 )
                 else:
@@ -391,10 +384,10 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
         """Print an image as a pixel access object with binary colour."""
         if resolution == "high":
             scaling = 24
-            currentpxWidth = self.device.pxWidth * 2
+            currentpxWidth = self.printer.pxWidth * 2
         else:
             scaling = 8
-            currentpxWidth = self.device.pxWidth
+            currentpxWidth = self.printer.pxWidth
         if width > currentpxWidth:
             raise ValueError("Image too wide. Maximum width is configured to be " + str(currentpxWidth) + "pixels. The image is " + str(width) + " pixels wide.")
         tmp = ''
@@ -446,9 +439,3 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
                     raise
                 
         self._write(tmp)
-
-            
-    def __init__(self):
-        path = os.path.dirname(__file__)
-        filename = path + '/logo.jpg'
-        #self._printImgFromFile(filename)
