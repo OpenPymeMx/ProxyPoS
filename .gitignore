@@ -39,10 +39,10 @@ Thumbs.db
 
 # Custom files
 #######################
-.bzr
-.bzrignore
+*.bzr
+*.bzrignore
 .settings
 .project
 .pydevproject
-.pyc
+*.pyc
 
