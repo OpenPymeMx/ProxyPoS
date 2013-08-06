@@ -249,18 +249,27 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
     def _init_printer(self):
         """ Init pos printer
         """
-        parser = SafeConfigParser()
-        path = os.path.dirname(__file__)
-        parser.read(path + '/devices.cfg')
+        rdy = False
 
-        for section_name in parser.sections():
-            if section_name == 'printer':
-                config = {}
-                for name, value in parser.items(section_name):
-                    config[name] = value
-        # Init printer
-        self.printer = printer.Usb(int(config['idvendor'], 16),
-                                   int(config['idproduct'], 16))
+        if hasattr(self, 'printer'):
+            try:
+                self.printer.hw('INIT')
+                rdy = True
+            except:
+                self.printer = None
+
+        if not rdy:
+            parser = SafeConfigParser()
+            path = os.path.dirname(__file__)
+            parser.read(path + '/devices.cfg')
+
+            for section_name in parser.sections():
+                if section_name == 'printer':
+                    config = {}
+                    for name, value in parser.items(section_name):
+                        config[name] = value
+            self.printer = printer.Usb(int(config['idvendor'], 16),
+                                       int(config['idproduct'], 16))
 
     # Helper functions to facilitate printing
     def _format_date(self, date):
