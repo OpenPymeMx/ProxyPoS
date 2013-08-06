@@ -48,8 +48,7 @@ Main Features
 * Refund previous sales
     """,
     'author': 'OpenERP SA',
-    'images': ['images/pos_touch_screen.jpeg', 'images/pos_session.jpeg', 'images/pos_analysis.jpeg','images/sale_order_pos.jpeg','images/product_pos.jpeg'],
-    'depends': ['sale_stock'],
+    'images': ['images/pos_touch_screen.jpeg', 'images/pos_session.jpeg', 'images/pos_analysis.jpeg', 'images/sale_order_pos.jpeg', 'images/product_pos.jpeg'],
     'data': [
         'security/point_of_sale_security.xml',
         'security/ir.model.access.csv',
@@ -101,8 +100,8 @@ Main Features
         'static/src/js/main.js',
     ],
     'css': [
-        'static/src/css/pos.css', # this is the default css with hover effects
-        #'static/src/css/pos_nohover.css', # this css has no hover effects (for resistive touchscreens)
+        'static/src/css/pos.css',  # this is the default css with hover effects
+        # 'static/src/css/pos_nohover.css', # this css has no hover effects (for resistive touchscreens)
         'static/src/css/keyboard.css'
     ],
     'qweb': ['static/src/xml/pos.xml'],
