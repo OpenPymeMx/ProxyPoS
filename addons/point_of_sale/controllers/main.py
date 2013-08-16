@@ -5,6 +5,7 @@ import simplejson
 import os
 import io
 import openerp
+
 from escpos import *
 
 from openerp.addons.web.controllers.main import manifest_list, module_boot, html_template
@@ -183,7 +184,7 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
         """
         The user send a receipt to print
         """
-        # print 'print_receipt'
+        # print 'print_receipt' + str(receipt)
         self._print_receipt(receipt)
         return
 
@@ -240,9 +241,19 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
         self._bold(True)
         self._write('Cambio:', '$ ' + self._decimal(receipt['change']))
 
+        # Write customer data
+        client = receipt['client']
+        if client:
+            self._lineFeed(4)
+            self._bold(False)
+            self._write('Cliente: ' + client['name'].encode('utf-8'))
+            self._lineFeed(1)
+            self._write((u'Teléfono: ' + client['phone']).encode('utf-8'))
+            self._lineFeed(1)
+            self._write('Dirección: ' + client['contact_address'].encode('utf-8'))
+            self._lineFeed(1)
+
         # Footer space
-        self._lineFeed(2)
-        self._bold(False)
         self._write('GRACIAS POR SU COMPRA', '', 'center')
         self._lineFeedCut(1, True)
 
