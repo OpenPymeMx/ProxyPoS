@@ -240,12 +240,12 @@ class PointOfSaleController(openerp.addons.web.http.Controller):
 
         self._bold(True)
         self._write('Cambio:', '$ ' + self._decimal(receipt['change']))
+        self._bold(False)
 
         # Write customer data
         client = receipt['client']
         if client:
             self._lineFeed(4)
-            self._bold(False)
             self._write('Cliente: ' + client['name'].encode('utf-8'))
             self._lineFeed(1)
             self._write((u'Teléfono: ' + client['phone']).encode('utf-8'))
