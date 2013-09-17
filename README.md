@@ -47,9 +47,9 @@ Example:
 Then look for the file devices.cfg on folder addons/point_of_sale/controllers/
 and write down the the values in question.
 
-  [printer]
-  idVendor = 0x0483
-  idProduct = 0x5740
+    [printer]
+    idVendor = 0x0483
+    idProduct = 0x5740
 
 
 ## TODO:
