@@ -54,11 +54,11 @@ and write down the the values in question.
 
 ## TODO:
 
-1. Add support for templates on receipts
-2. Add support for Barcode Reader
-3. Add support for Electronic Balance
-4. GUI for know current status & configuration
-5. Simplify installation
+1. Merge with https://github.com/diassynthesis/OpenERP-ledDisplay to get ride off OE modules & structure
+2. Add support for templates on receipts
+3. Add support for Barcode Reader
+4. Add support for Electronic Balance
+5. GUI for know current status & configuration
 
 ## Contributing
 
