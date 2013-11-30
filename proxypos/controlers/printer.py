@@ -1,7 +1,62 @@
-from ConfigParser import SafeConfigParser
-from escpos import *
+# -*- encoding: utf-8 -*-
+###########################################################################
+#    Copyright (c) 2013 OpenPyme - http://www.openpyme.mx/
+#    All Rights Reserved.
+#    Coded by: Agustín Cruz Lozano (agustin.cruz@openpyme.mx)
+#
+#    Permission is hereby granted, free of charge, to any person obtaining a copy
+#    of this software and associated documentation files (the "Software"), to deal
+#    in the Software without restriction, including without limitation the rights
+#    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+#    copies of the Software, and to permit persons to whom the Software is
+#    furnished to do so, subject to the following conditions:
+#
+#    The above copyright notice and this permission notice shall be included in
+#    all copies or substantial portions of the Software.
+#
+#    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+#    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+#    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+#    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+#    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+#    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+#    THE SOFTWARE.
+#
+##############################################################################
 
-class printer():
+from ConfigParser import SafeConfigParser
+from escpos import printer
+
+class printer:
+    """ ESC/POS Printer object """
+
+    def __init__(self):
+        """ Init printer
+        """
+        rdy = False
+
+        if hasattr(self, 'printer'):
+            try:
+                self.printer.hw('INIT')
+                rdy = True
+            except:
+                self.printer = None
+
+        if not rdy:
+            parser = SafeConfigParser()
+            path = os.path.dirname(__file__)
+            parser.read(path + '/devices.cfg')
+
+            for section_name in parser.sections():
+                if section_name == 'printer':
+                    config = {}
+                    for name, value in parser.items(section_name):
+                        config[name] = value
+            self.printer = printer.Usb(int(config['idvendor'], 16),
+                                       int(config['idproduct'], 16))
+
+
+
     def _print_receipt(self, receipt):
         self._init_printer()
         path = os.path.dirname(__file__)
@@ -66,41 +121,17 @@ class printer():
         self._write('GRACIAS POR SU COMPRA', '', 'center')
         self._lineFeedCut(1, True)
 
-    def _init_printer(self):
-        "" Init pos printer
-        ""
-        rdy = False
-
-        if hasattr(self, 'printer'):
-            try:
-                self.printer.hw('INIT')
-                rdy = True
-            except:
-                self.printer = None
-
-        if not rdy:
-            parser = SafeConfigParser()
-            path = os.path.dirname(__file__)
-            parser.read(path + '/devices.cfg')
-
-            for section_name in parser.sections():
-                if section_name == 'printer':
-                    config = {}
-                    for name, value in parser.items(section_name):
-                        config[name] = value
-            self.printer = printer.Usb(int(config['idvendor'], 16),
-                                       int(config['idproduct'], 16))
 
     # Helper functions to facilitate printing
     def _format_date(self, date):
         string = str(date['date']) + '/' + str(date['month']) + '/' + str(date['year']) + ' ' + str(date['hour']) + ':' + "%02d" % date['minute']
         return string
 
-    def _write(self, string, rcolStr = None, align = "left"):
-        ""Write simple text string. Remember \n for newline where applicable.
+    def _write(self, string, rcolStr=None, align="left"):
+        """Write simple text string. Remember \n for newline where applicable.
         rcolStr is a righthand column that may be added (e.g. a price on a receipt). 
         Be aware that when rcolStr is used newline(s) may only be a part of rcolStr, 
-        and only as the last character(s).""
+        and only as the last character(s)."""
         if align != "left" and len(string) < self.printer.width:
             blanks = 0
             if align == "right":
@@ -133,8 +164,8 @@ class printer():
             except:
                 raise
 
-    def _lineFeed(self, times = 1, cut = False):
-        ""Write newlines and optional cut paper""
+    def _lineFeed(self, times=1, cut=False):
+        """Write newlines and optional cut paper"""
         while times:
             try:
                 self.printer.text("\n")
@@ -147,14 +178,14 @@ class printer():
             except:
                 raise
 
-    def _lineFeedCut(self, times = 6, cut = True):
-            ""Enough line feed for the cut to be beneath the previously printed text etc.""
+    def _lineFeedCut(self, times=6, cut=True):
+            """Enough line feed for the cut to be beneath the previously printed text etc."""
             try:
                 self._lineFeed(times, cut)
             except:
                 raise
 
-    def _font(self, font = 'a'):
+    def _font(self, font='a'):
         if font == 'a':
             self.printer._raw('\x1b\x4d\x01')
             self.printer.width = 42
@@ -162,7 +193,7 @@ class printer():
             self.printer._raw('\x1b\x4d\x00')
             self.printer.width = 32
 
-    def _bold(self, bold = True):
+    def _bold(self, bold=True):
         if bold:
             self.printer._raw('\x1b\x45\x01')
         else:
@@ -171,11 +202,11 @@ class printer():
     def _decimal(self, number):
         return "%0.2f" % int(number)
 
-    def _printImgFromFile(self, filename, resolution = "high", align = "center", scale = None):
-        ""Print an image from a file.
+    def _printImgFromFile(self, filename, resolution="high", align="center", scale=None):
+        """Print an image from a file.
         resolution may be set to "high" or "low". Setting it to low makes the image a bit narrow (90x60dpi instead of 180x180 dpi) unless scale is also set.
         align may be set to "left", "center" or "right".
-        scale resizes the image with that factor, where 1.0 is the full width of the paper.""
+        scale resizes the image with that factor, where 1.0 is the full width of the paper."""
         try:
             import Image
             # Open file and convert to black/white (colour depth of 1 bit)
@@ -184,8 +215,8 @@ class printer():
         except:
             raise
 
-    def _printImgFromPILObject(self, imgObject, resolution = "high", align = "center", scale = None):
-        ""The object must be a Python ImageLibrary object, and the colordepth should be set to 1.""
+    def _printImgFromPILObject(self, imgObject, resolution="high", align="center", scale=None):
+        """The object must be a Python ImageLibrary object, and the colordepth should be set to 1."""
         try:
             # If a scaling factor has been indicated
             if scale:
@@ -213,7 +244,7 @@ class printer():
             raise
 
     def _printImgMatrix(self, imgMatrix, width, height, resolution, align):
-        ""Print an image as a pixel access object with binary colour.""
+        """Print an image as a pixel access object with binary colour."""
         if resolution == "high":
             scaling = 24
             currentpxWidth = self.printer.pxWidth * 2

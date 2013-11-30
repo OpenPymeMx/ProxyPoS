@@ -1,0 +1,5 @@
+#!/usr/bin/env python
+import proxypos
+
+if __name__ == "__main__":
+    proxypos.main()
