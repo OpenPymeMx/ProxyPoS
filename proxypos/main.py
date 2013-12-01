@@ -27,7 +27,9 @@
 import logging
 import simplejson as json
 
-from bottle import Bottle, request
+from bottle import Bottle, request, static_file
+from controlers import printer
+
 
 # Helper funciont to process json request
 def _get_data(param=None):
@@ -36,6 +38,8 @@ def _get_data(param=None):
 
 # Main web app
 app = Bottle()
+
+# Init logger
 logger = logging.getLogger(__name__)
 
 @app.route('/pos/scan_item_success')
@@ -141,15 +145,26 @@ def cashier_mode_deactivated():
 @app.route('/pos/open_cashbox')
 def open_cashbox():
     logger.info('open_cashbox')
-    from controlers import printer
-    printer.cashdraw()
+    try:
+        device = printer.device()
+        device.open_cashbox()
+    except (SystemExit, KeyboardInterrupt):
+        raise
+    except Exception, e:
+        logger.error('Failed to open the cashbox', exc_info=True)
     return
 
 @app.route('/pos/print_receipt')
 def print_receipt():
     receipt = _get_data('receipt')
     logger.info('Print receipt %s', str(receipt))
-    # self._print_receipt(receipt)
+    try:
+        device = printer.device()
+        device.print_receipt(receipt)
+    except (SystemExit, KeyboardInterrupt):
+        raise
+    except Exception, e:
+        logger.error('Failed to print receipt', exc_info=True)
     return
 
 @app.route('/pos/print_pdf_invoice')
