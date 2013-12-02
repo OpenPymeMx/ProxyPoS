@@ -27,7 +27,7 @@
 import logging
 import simplejson as json
 
-from bottle import Bottle, request, static_file
+from bottle import Bottle, request
 from controlers import printer
 
 
