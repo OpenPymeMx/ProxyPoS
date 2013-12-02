@@ -69,12 +69,18 @@ class device:
 
 
     def print_receipt(self, receipt):
+        """ Function used for print the recipt, currently is the only
+        place where you can customize your printout.
+        """
+
         path = os.path.dirname(__file__)
 
         filename = path + '/logo.jpg'
 
         self.printer.pxWidth = 206
         self.printer.image(filename)
+
+        self._printImgFromFile(filename)
 
         date = self._format_date(receipt['date'])
         self._bold(False)
@@ -210,3 +216,104 @@ class device:
 
     def _decimal(self, number):
         return "%0.2f" % int(number)
+
+    def _printImgFromFile(self, filename, resolution="high", align="center", scale=None):
+        """Print an image from a file.
+        resolution may be set to "high" or "low". Setting it to low makes the image a bit narrow (90x60dpi instead of 180x180 dpi) unless scale is also set.
+        align may be set to "left", "center" or "right".
+        scale resizes the image with that factor, where 1.0 is the full width of the paper."""
+        try:
+            import Image
+            # Open file and convert to black/white (colour depth of 1 bit)
+            img = Image.open(filename).convert("1")
+            self._printImgFromPILObject(img, resolution, align, scale)
+        except:
+            raise
+
+    def _printImgFromPILObject(self, imgObject, resolution="high", align="center", scale=None):
+        """The object must be a Python ImageLibrary object, and the colordepth should be set to 1."""
+        try:
+            # If a scaling factor has been indicated
+            if scale:
+                assert type(scale) == float
+                if scale > 1.0 or scale <= 0.0:
+                    raise ValueError, "scale: Scaling factor must be larger than 0.0 and maximum 1.0"
+                # Give a consistent output regardless of the resolution setting
+                scale *= self.printer.pxWidth / float(imgObject.size[0])
+                if resolution is "high":
+                    scaleTuple = (scale * 2, scale * 2)
+                else:
+                    scaleTuple = (scale, scale * 2 / 3.0)
+                # Convert to binary colour depth and resize
+                imgObjectB = imgObject.resize([ int(scaleTuple[i] * imgObject.size[i]) for i in range(2) ]).convert("1")
+            else:
+                # Convert to binary colour depth
+                imgObjectB = imgObject.convert("1")
+            # Convert to a pixel access object
+            imgMatrix = imgObjectB.load()
+            width = imgObjectB.size[0]
+            height = imgObjectB.size[1]
+            # Print it
+            self._printImgMatrix(imgMatrix, width, height, resolution, align)
+        except:
+            raise
+
+    def _printImgMatrix(self, imgMatrix, width, height, resolution, align):
+        """Print an image as a pixel access object with binary colour."""
+        if resolution == "high":
+            scaling = 24
+            currentpxWidth = self.printer.pxWidth * 2
+        else:
+            scaling = 8
+            currentpxWidth = self.printer.pxWidth
+        if width > currentpxWidth:
+            raise ValueError("Image too wide. Maximum width is configured to be " + str(currentpxWidth) + "pixels. The image is " + str(width) + " pixels wide.")
+        tmp = ''
+        for yScale in range(-(-height / scaling)):
+            # Set mode to hex and 8-dot single density (60 dpi).
+            if resolution == "high":
+                outList = [ "0x1B", "0x2A", "0x21" ]
+            else:
+                outList = [ "0x1B", "0x2A", "0x00" ]
+            # Add width to the communication to the printer. Depending on the alignment we count that in and add blank vertical lines to the outList
+            if align == "left":
+                blanks = 0
+            if align == "center":
+                blanks = (currentpxWidth - width) / 2
+            if align == "right":
+                blanks = currentpxWidth - width
+            highByte = (width + blanks) / 256
+            lowByte = (width + blanks) % 256
+            outList.append(hex(lowByte))
+            outList.append(hex(highByte))
+            if resolution == "high":
+                blanks *= 3
+            if align == "left":
+                pass
+            if align == "center":
+                for i in range(blanks):
+                    outList.append(hex(0))
+            if align == "right":
+                for i in range(blanks):
+                    outList.append(hex(0))
+            for x in range(width):
+                # Compute hex string for one vertical bar of 8 dots (zero padded from the bottom if necessary).
+                binStr = ""
+                for y in range(scaling):
+                    # Indirect zero padding. Do not try to extract values from images beyond its size.
+                    if (yScale * scaling + y) < height:
+                        binStr += "0" if imgMatrix[x, yScale * scaling + y] == 255 else "1"
+                    # Zero padding
+                    else:
+                        binStr += "0"
+                outList.append(hex(int(binStr[0:8], 2)))
+                if resolution == "high":
+                    outList.append(hex(int(binStr[8:16], 2)))
+                    outList.append(hex(int(binStr[16:24], 2)))
+            for element in outList:
+                try:
+                    tmp += chr(int(element, 16))
+                except:
+                    raise
+
+        self._write(tmp)
