@@ -27,12 +27,12 @@ You will first need to install the following packages:
 
 1. python version >= 2.6
 2. At least one of the supported libraries (libusb 1.0, libusb 0.1 or OpenUSB)
-3. python imaging & setuptools
+3. python imaging, python yaml & setuptools
 4. Git get some packages needed
 
 For example, the command:
 
-```$ sudo apt-get install python python-imaging python-setuptools libusb-dev git```
+```$ sudo apt-get install python python-imaging python-setuptools python-yaml libusb-dev git```
 
 should install all these packages on most Debian-based systems with access to the proper package repositories.
 
@@ -78,7 +78,7 @@ Build and install it:
 
 ### Create user for ProxyPoS
 
-    sudo adduser --system --shell /bin/bash --home /home/proxypos/ proxypos
+    sudo adduser --system --shell /bin/bash --group dialout --home /home/proxypos/ proxypos
     
 We'll install ProxyPoS into home directory of the user `proxypos`:
 
@@ -90,9 +90,14 @@ We'll install ProxyPoS into home directory of the user `proxypos`:
 ### Configure it
 Copy the example ProxyPos config files and customice as you need
 
-    cp config/logging.yaml.example config/logging.yaml
-    cp config/printer.yaml.example config/printer.yaml
+    cp proxypos/config/logging.yaml.example config/logging.yaml
+    cp proxypos/config/printer.yaml.example config/printer.yaml
 
+
+### Make executable
+Make main script executable
+
+    sudo chmod +x /home/proxypos/proxypos/proxypos-server
     
 ----------
 
@@ -104,7 +109,7 @@ Copy the example ProxyPos config files and customice as you need
     
 2. Write the values on the printer.yaml file
 
-    sudo vi /home/proxypos/proxypos/config/printer.yaml
+    vi /home/proxypos/proxypos/config/printer.yaml
 
 3. Create a udev rule to let users belonging to dialout group use the printer. 
 You can create the file /etc/udev/rules.d/99-escpos.rules and add the following:
@@ -112,8 +117,6 @@ You can create the file /etc/udev/rules.d/99-escpos.rules and add the following:
     SUBSYSTEM=="usb", ATTRS{idVendor}=="1a2b", ATTRS{idProduct}=="1a2b", MODE="0664", GROUP="dialout"
     
 Replace idVendor and idProduct hex numbers with the ones that you got from the step #1. 
-Note that you can either, add yourself to "dialout" group, or use another group you already 
-belongs instead "dialout" and set it in the GROUP parameter in the above rule.
 
 4. Restart udev
 
@@ -123,8 +126,8 @@ belongs instead "dialout" and set it in the GROUP parameter in the above rule.
 
 Move the init script to  /etc/init.d/proxypos:
 
-    cp /home/proxypos/proxypos/init/sysvinit/ubuntu/proxypos /etc/init.d/
-    chmod +x /etc/init.d/proxypos
+    sudo cp /home/proxypos/proxypos/init/sysvinit/ubuntu/proxypos /etc/init.d/
+    sudo chmod +x /etc/init.d/proxypos
     sudo chown root: /etc/init.d/proxypos
 
 Make ProxyPoS start on boot:
@@ -138,5 +141,5 @@ Create directory for log files and set permissions
     
 Start your ProxyPoS instance:
 
-    sudo /etc/init.d/proypos start
+    sudo /etc/init.d/proxypos start
     
