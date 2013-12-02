@@ -24,23 +24,48 @@
 #
 ##############################################################################
 
-import logging
+import os
+import logging.config
+import yaml
+
 import simplejson as json
 
-from bottle import Bottle, request, static_file
+from bottle import Bottle, request, run
 from controlers import printer
 
+###############################################
+# Helper functions
 
-# Helper funciont to process json request
+# Helper function to process json request
 def _get_data(param=None):
     jsonrpc = request.GET.get('r')
     return json.loads(jsonrpc)['params'][param]
 
+
+# Helper function to initializate logging
+def setup_logging(
+    default_path='config/logging.yaml',
+    default_level=logging.INFO,
+    env_key='LOG_CFG'
+):
+    """Setup logging configuration
+
+    """
+    path = default_path
+    value = os.getenv(env_key, None)
+    if value:
+        path = value
+    if os.path.exists(path):
+        with open(path, 'rt') as f:
+            config = yaml.load(f.read())
+        logging.config.dictConfig(config)
+    else:
+        logging.basicConfig(level=default_level)
+
+
+###############################################
 # Main web app
 app = Bottle()
-
-# Init logger
-logger = logging.getLogger(__name__)
 
 @app.route('/pos/scan_item_success')
 def scan_item_success(ean=None):
@@ -172,3 +197,13 @@ def print_pdf_invoice():
     pdfinvoice = _get_data('pdfinvoice')
     logger.info('print_pdf_invoice %s', str(pdfinvoice))
     return
+
+
+if __name__ == "__main__":
+    # Start logg
+    setup_logging()
+    # Interactive mode
+    logger = logging.getLogger(__name__)
+    logger.info("ProxyPos server starting up...")
+    logger.info("Listening on http://%s:%s/" % ('localhost', '8069'))
+    run(app, host='localhost', port='8069', quiet=True)
