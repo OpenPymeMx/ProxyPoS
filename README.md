@@ -28,6 +28,17 @@ The easy way to customize the receipts is directly editing the
 ```print_receipt``` function on proxypos/controlers/printer.py
 
 
+## Supported Hardware
+------------------------------------------------------------------
+
+The system has been testing successfully working on LinuxMint 13
+with following ESCPoS printers:
+
+* EC 5894 - EC Line
+* EC 5890X - EC Line
+* TMU-220D - Epson
+
+
 ## TODO:
 
 1. ~~Simplify the app using different webserver than the OE web module~~
