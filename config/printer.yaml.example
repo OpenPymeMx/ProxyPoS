@@ -1,0 +1,6 @@
+---
+printer:
+  type: usb
+  settings:
+    idVendor: 0x0483
+    idProduct: 0x5740
