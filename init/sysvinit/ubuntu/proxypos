@@ -13,7 +13,7 @@
 ### END INIT INFO
 
 PATH=/bin:/sbin:/usr/bin
-DAEMON=/opt/proxypos/proxypos-server
+DAEMON=/home/proxypos/proxypos/proxypos-server
 NAME=proxypos
 DESC=proxypos
 
