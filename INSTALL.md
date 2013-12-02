@@ -120,6 +120,7 @@ Replace idVendor and idProduct hex numbers with the ones that you got from the s
 
 4. Restart udev
 
+    sudo udevadm trigger
     sudo service udev restart
     
 ## 4. Install Init Script

@@ -24,7 +24,6 @@ USER=proxypos
 PIDFILE=/var/run/$NAME.pid
 
 [ -x $DAEMON ] || exit 0
-[ -f $CONFIGFILE ] || exit 0
 
 checkpid() {
     [ -f $PIDFILE ] || return 1
@@ -39,7 +38,7 @@ case "${1}" in
 
                 start-stop-daemon --start --quiet --pidfile ${PIDFILE} \
                         --chuid ${USER} --background --make-pidfile \
-                        --exec ${DAEMON} -- ${DAEMON_OPTS}
+                        --exec ${DAEMON}
 
                 echo "${NAME}."
                 ;;
