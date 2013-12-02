@@ -34,7 +34,7 @@ from main import app
 
 
 def setup_logging(
-    default_path='logging.yaml',
+    default_path='config/logging.yaml',
     default_level=logging.INFO,
     env_key='LOG_CFG'
 ):

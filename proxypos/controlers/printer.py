@@ -35,7 +35,7 @@ class device:
 
     def __init__(
         self,
-        default_path='printer.yaml',
+        default_path='config/printer.yaml',
         env_key='LOG_CFG'
     ):
         """Setup printer configuration
