@@ -37,6 +37,10 @@ Icon?
 ehthumbs.db
 Thumbs.db
 
+# Configuration files #
+#######################
+*.yaml
+
 # Custom files
 #######################
 *.bzr
@@ -45,4 +49,3 @@ Thumbs.db
 .project
 .pydevproject
 *.pyc
-
