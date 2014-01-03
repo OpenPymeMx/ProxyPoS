@@ -59,6 +59,9 @@ class device:
             elif ptype == 'network':
                 # TODO: Implement support for network printers
                 pass
+            # Assign other default values
+            self.printer.pxWidth = settings['pxWidth']
+            self.printer.width = settings['charWidth']
         else:
             logger = logging.getLogger(__name__)
             logger.critical('Could not read printer configuration')
@@ -76,9 +79,6 @@ class device:
         path = os.path.dirname(__file__)
 
         filename = path + '/logo.jpg'
-
-        self.printer.pxWidth = 206
-        self.printer.image(filename)
 
         self._printImgFromFile(filename)
 

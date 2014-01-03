@@ -2,5 +2,20 @@
 printer:
   type: usb
   settings:
+    # USB settings for communicate with printer
+    # use lsusb for get them 
+    
     idVendor: 0x0483
     idProduct: 0x5740
+
+    # For propoer aligment on recipts we must set widths
+    # according to the printer specifications
+    #
+    # charWidth sets the number of characters printer
+    # could print per line
+    #
+    # pxWidht sets the total pixel width an is used only for
+    # control the image printing for being center    
+
+    charWidth: 44
+    pxWidth: 206
