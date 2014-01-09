@@ -11,11 +11,15 @@ printer:
     # For propoer aligment on recipts we must set widths
     # according to the printer specifications
     #
-    # charWidth sets the number of characters printer
-    # could print per line
+    # PoS printers are able to print on two different fonts
+    # FontA & Font B
+    # 
+    # using WidthA & WidhtB we can set the number of chars
+    # available for each font
     #
     # pxWidht sets the total pixel width an is used only for
     # control the image printing for being center    
 
-    charWidth: 44
+    WidthA: 44
+    WidthB: 34
     pxWidth: 206

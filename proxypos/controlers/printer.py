@@ -61,7 +61,9 @@ class device:
                 pass
             # Assign other default values
             self.printer.pxWidth = settings['pxWidth']
-            self.printer.width = settings['charWidth']
+            # Set default widh with normal value
+            self.printer.width = self.printer.widthA = settings['WidthA']
+            self.printer.widthB = settings['WidthB']
         else:
             logger = logging.getLogger(__name__)
             logger.critical('Could not read printer configuration')
@@ -203,10 +205,10 @@ class device:
     def _font(self, font='a'):
         if font == 'a':
             self.printer._raw('\x1b\x4d\x01')
-            self.printer.width = 42
+            self.printer.width = self.printer.widthA
         else:
             self.printer._raw('\x1b\x4d\x00')
-            self.printer.width = 32
+            self.printer.width = self.printer.widthB
 
     def _bold(self, bold=True):
         if bold:
