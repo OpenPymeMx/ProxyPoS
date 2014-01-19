@@ -1,12 +1,17 @@
 ---
 printer:
-  type: usb
+  # type: usb       # Uncomment this for an usb printer
+  # type: serial    # Uncomment this for a serial printer
   settings:
     # USB settings for communicate with printer
     # use lsusb for get them 
     
     idVendor: 0x0483
     idProduct: 0x5740
+    
+    # settings for serial printers
+    
+    #devfile: /dev/ttyS0
 
     # For propoer aligment on recipts we must set widths
     # according to the printer specifications

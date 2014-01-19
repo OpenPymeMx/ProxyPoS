@@ -12,6 +12,7 @@ All contributions are welcome, just see Contributing section for general guide l
 ## Features
 
 * USB PoS printter support
+* Serial PoS printter support
 
 ## Dependencies & Installation
 ------------------------------------------------------------------
@@ -22,7 +23,7 @@ All contributions are welcome, just see Contributing section for general guide l
 ## Sales Receipt Customization
 ------------------------------------------------------------------
 
-At the momment there is support for custom receipts templates,
+At the momment there is no support for custom receipts templates,
 we are currently working on to add this feature. 
 The easy way to customize the receipts is directly editing the
 ```print_receipt``` function on proxypos/controlers/printer.py

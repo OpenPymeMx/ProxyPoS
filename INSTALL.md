@@ -26,9 +26,9 @@ These instructions are proved for Linux Mint, instructions for other flavors of 
 You will first need to install the following packages:
 
 1. python version >= 2.6
-2. At least one of the supported libraries (libusb 1.0, libusb 0.1 or OpenUSB)
-3. python imaging, python yaml & setuptools
-4. Git get some packages needed
+2. python imaging, python yaml & setuptools
+3. Git for install some packages needed
+4. For support USB printers, at least one of the supported libraries (libusb 1.0, libusb 0.1 or OpenUSB)
 
 For example, the command:
 
@@ -36,7 +36,8 @@ For example, the command:
 
 should install all these packages on most Debian-based systems with access to the proper package repositories.
 
-### 1. PyUSB
+### 1. Base libraries for ESC/PoS printers
+If you are going to use the software with an USB printer, you must install pyusb
 Checkout the latest code from github
 Build and install it:
 
@@ -45,6 +46,15 @@ Build and install it:
     cd pyusb
     python setup.py build
     sudo python setup.py install
+    
+If you are going to use the software with a serial printer, you must install pyserial
+For Debian based distros use this command:
+
+    sudo apt-get install pyserial
+    
+For Fedora & Centos based distros use this other command:
+
+    sudo yum install pyserial
 
 ----------
 
@@ -102,6 +112,8 @@ Make main script executable
 ----------
 
 ## 3. Hardware Setup
+
+### 3.1 USB Printers
 1. Get the Product ID and Vendor ID from the lsusb command
 
     lsusb
@@ -122,6 +134,14 @@ Replace idVendor and idProduct hex numbers with the ones that you got from the s
 
     sudo udevadm trigger
     sudo service udev restart
+    
+### 3.1 Serial Printers
+1. Must of the default values set by the DIP switches for the serial printers, have been set as default on the serial printer class, so the only thing you need to know is which serial port the printer is hooked up.
+devfile is an alphanumeric device file name under /dev filesystem, default value is /dev/ttyS0
+    
+2. Write the correct values on the printer.yaml file
+
+    vi /home/proxypos/proxypos/config/printer.yaml
     
 ## 4. Install Init Script
 

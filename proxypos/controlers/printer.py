@@ -54,8 +54,7 @@ class device:
             if ptype == 'usb':
                 self.printer = printer.Usb(settings['idVendor'], settings['idProduct'])
             elif ptype == 'serial':
-                # TODO: Implement support for serial printers
-                pass
+                self.printer = printer.Serial(settings['devfile'])
             elif ptype == 'network':
                 # TODO: Implement support for network printers
                 pass
