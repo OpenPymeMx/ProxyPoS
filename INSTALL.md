@@ -135,9 +135,17 @@ Replace idVendor and idProduct hex numbers with the ones that you got from the s
     sudo udevadm trigger
     sudo service udev restart
     
-### 3.1 Serial Printers
+### 3.2 Serial Printers
 1. Must of the default values set by the DIP switches for the serial printers, have been set as default on the serial printer class, so the only thing you need to know is which serial port the printer is hooked up.
 devfile is an alphanumeric device file name under /dev filesystem, default value is /dev/ttyS0
+    
+2. Write the correct values on the printer.yaml file
+
+    vi /home/proxypos/proxypos/config/printer.yaml
+
+### 3.3 Network Printers
+1. You only need the IP of your printer, either because it is getting its IP by DHCP or you set it manually.
+host is an alphanumeric host name, could be either DNS host name or IP address.
     
 2. Write the correct values on the printer.yaml file
 

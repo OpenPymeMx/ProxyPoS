@@ -56,8 +56,7 @@ class device:
             elif ptype == 'serial':
                 self.printer = printer.Serial(settings['devfile'])
             elif ptype == 'network':
-                # TODO: Implement support for network printers
-                pass
+                self.printer = printer.Network(settings['host'])
             # Assign other default values
             self.printer.pxWidth = settings['pxWidth']
             # Set default widh with normal value
