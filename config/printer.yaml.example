@@ -31,3 +31,5 @@ printer:
     WidthA: 44
     WidthB: 34
     pxWidth: 206
+    
+    charSet: \x1b\x52\x12
