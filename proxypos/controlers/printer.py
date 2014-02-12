@@ -94,7 +94,7 @@ class device:
 
         self._write(receipt['company']['name'] + '\n')
         self._write('RFC: ' + str(receipt['company']['company_registry']) + '\n')
-        self._write(str(receipt['company']['contact_address']))
+        self._write(str(receipt['company']['contact_address']) + '\n')
         self._write('Telefono: ' + str(receipt['company']['phone']) + '\n')
         self._write('Cajero: ' + str(receipt['cashier']) + '\n')
         # self._write('Tienda: ' + receipt['store']['name'])
@@ -103,7 +103,7 @@ class device:
             left = ' '.join([str(line['quantity']),
                              line['unit_name'],
                              line['product_name']
-                            ])
+                            ]).encode('utf-8')
             right = self._decimal(line['price_with_tax'])
             self._write(left, right)
             self._lineFeed(1)
@@ -224,7 +224,7 @@ class device:
             self.printer._raw('\x1b\x45\x00')
 
     def _decimal(self, number):
-        return "%0.2f" % int(number)
+        return "%0.2f" % float(number)
 
     def _printImgFromFile(self, filename, resolution="high", align="center", scale=None):
         """Print an image from a file.
