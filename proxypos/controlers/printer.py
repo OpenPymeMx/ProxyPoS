@@ -30,6 +30,8 @@ import logging
 
 from escpos import printer
 
+logger = logging.getLogger(__name__)
+
 class device:
     """ ESC/POS device object """
 
@@ -54,13 +56,17 @@ class device:
             if ptype == 'usb':
                 self.printer = printer.Usb(settings['idVendor'], settings['idProduct'])
             elif ptype == 'serial':
-                # TODO: Implement support for serial printers
-                pass
+                self.printer = printer.Serial(settings['devfile'])
             elif ptype == 'network':
-                # TODO: Implement support for network printers
-                pass
+                self.printer = printer.Network(settings['host'])
+            # Assign other default values
+            self.printer.pxWidth = settings['pxWidth']
+            # Set default widh with normal value
+            self.printer.width = self.printer.widthA = settings['WidthA']
+            self.printer.widthB = settings['WidthB']
+            # Set correc table character
+            self.printer._raw(settings['charSet'])
         else:
-            logger = logging.getLogger(__name__)
             logger.critical('Could not read printer configuration')
 
 
@@ -72,13 +78,9 @@ class device:
         """ Function used for print the recipt, currently is the only
         place where you can customize your printout.
         """
-
         path = os.path.dirname(__file__)
 
         filename = path + '/logo.jpg'
-
-        self.printer.pxWidth = 206
-        self.printer.image(filename)
 
         self._printImgFromFile(filename)
 
@@ -92,12 +94,16 @@ class device:
 
         self._write(receipt['company']['name'] + '\n')
         self._write('RFC: ' + str(receipt['company']['company_registry']) + '\n')
+        self._write(str(receipt['company']['contact_address']) + '\n')
         self._write('Telefono: ' + str(receipt['company']['phone']) + '\n')
         self._write('Cajero: ' + str(receipt['cashier']) + '\n')
         # self._write('Tienda: ' + receipt['store']['name'])
         self._lineFeed(1)
         for line in receipt['orderlines']:
-            left = str(line['quantity']) + ' ' + str(line['unit_name']) + ' ' + str(line['product_name'])
+            left = ' '.join([str(line['quantity']),
+                             line['unit_name'],
+                             line['product_name']
+                            ]).encode('utf-8')
             right = self._decimal(line['price_with_tax'])
             self._write(left, right)
             self._lineFeed(1)
@@ -114,12 +120,14 @@ class device:
         self._lineFeed(1)
         self._font('a')
         self._bold(False)
-        for payment in receipt['paymentlines']:
-            self._write(payment['journal'], self._decimal(payment['amount']))
+        paymentlines = receipt['paymentlines']
+        if paymentlines:
+            for payment in paymentlines:
+                self._write(payment['journal'], self._decimal(payment['amount']))
 
-        self._bold(True)
-        self._write('Cambio:', '$ ' + self._decimal(receipt['change']))
-        self._bold(False)
+            self._bold(True)
+            self._write('Cambio:', '$ ' + self._decimal(receipt['change']))
+            self._bold(False)
 
         # Write customer data
         client = receipt['client']
@@ -144,8 +152,8 @@ class device:
 
     def _write(self, string, rcolStr=None, align="left"):
         """Write simple text string. Remember \n for newline where applicable.
-        rcolStr is a righthand column that may be added (e.g. a price on a receipt). 
-        Be aware that when rcolStr is used newline(s) may only be a part of rcolStr, 
+        rcolStr is a righthand column that may be added (e.g. a price on a receipt).
+        Be aware that when rcolStr is used newline(s) may only be a part of rcolStr,
         and only as the last character(s)."""
         if align != "left" and len(string) < self.printer.width:
             blanks = 0
@@ -157,9 +165,9 @@ class device:
 
         if not rcolStr:
             try:
-                self.printer.text(str(string))
+                self.printer.text(string)
             except:
-                print 'No pude escribir'
+                logger.error('No pude escribir', exc_info=1)
                 raise
         else:
             rcolStrRstripNewline = rcolStr.rstrip("\n")
@@ -177,6 +185,7 @@ class device:
             try:
                 self.printer.text(string + rcolStr)
             except:
+                logger.error('No pude escribir', exc_info=1)
                 raise
 
     def _lineFeed(self, times=1, cut=False):
@@ -203,10 +212,10 @@ class device:
     def _font(self, font='a'):
         if font == 'a':
             self.printer._raw('\x1b\x4d\x01')
-            self.printer.width = 42
+            self.printer.width = self.printer.widthA
         else:
             self.printer._raw('\x1b\x4d\x00')
-            self.printer.width = 32
+            self.printer.width = self.printer.widthB
 
     def _bold(self, bold=True):
         if bold:
@@ -215,7 +224,7 @@ class device:
             self.printer._raw('\x1b\x45\x00')
 
     def _decimal(self, number):
-        return "%0.2f" % int(number)
+        return "%0.2f" % float(number)
 
     def _printImgFromFile(self, filename, resolution="high", align="center", scale=None):
         """Print an image from a file.
@@ -223,7 +232,7 @@ class device:
         align may be set to "left", "center" or "right".
         scale resizes the image with that factor, where 1.0 is the full width of the paper."""
         try:
-            import Image
+            from PIL import Image
             # Open file and convert to black/white (colour depth of 1 bit)
             img = Image.open(filename).convert("1")
             self._printImgFromPILObject(img, resolution, align, scale)

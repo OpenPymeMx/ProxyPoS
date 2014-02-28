@@ -54,10 +54,19 @@ def setup_logging(
 
 
 def main():
+    # Set default configuration
+    port = '8069'
+    path = 'config/proxypos.yaml'
     # Start logg
     setup_logging()
     # Interactive mode
     logger = logging.getLogger(__name__)
     logger.info("ProxyPos server starting up...")
-    logger.info("Listening on http://%s:%s/" % ('localhost', '8069'))
-    run(app, host='localhost', port='8069', quiet=True)
+
+    if os.path.exists(path):
+        with open(path, 'rt') as f:
+            config = yaml.load(f.read())
+        port = config['port']
+
+    logger.info("Listening on http://%s:%s/" % ('localhost', port))
+    run(app, host='localhost', port=port, quiet=True)

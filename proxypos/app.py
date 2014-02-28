@@ -188,13 +188,13 @@ def print_receipt():
     """
     logger.info('Procesing /pos/print_receipt GET method')
     params = dict(request.params)
-    logger.debug('Params %s', str(params['r']))
     try:
+        logger.debug('Params %s', str(params['r']))
         receipt = json.loads(params['r'])['params']['receipt']
+        do_print(receipt)
     except:
         # TODO: If a flag is set could delete this except
         logger.info('Already printed receipt by POST method')
-    do_print(receipt)
     return
 
 
