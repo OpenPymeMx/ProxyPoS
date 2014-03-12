@@ -13,7 +13,8 @@
 ### END INIT INFO
 
 PATH=/bin:/sbin:/usr/bin
-DAEMON=/home/proxypos/proxypos/proxypos-server
+DIR=/home/proxypos/proxypos
+EXEC=proxypos-server
 NAME=proxypos
 DESC=proxypos
 
@@ -38,7 +39,7 @@ case "${1}" in
 
                 start-stop-daemon --start --quiet --pidfile ${PIDFILE} \
                         --chuid ${USER} --background --make-pidfile \
-                        --exec ${DAEMON}
+                        -d ${DIR} --exec ${EXEC}
 
                 echo "${NAME}."
                 ;;
@@ -62,7 +63,7 @@ case "${1}" in
 
                 start-stop-daemon --start --quiet --pidfile ${PIDFILE} \
                         --chuid ${USER} --background --make-pidfile \
-                        --exec ${DAEMON} -- ${DAEMON_OPTS}
+                        -d ${DIR} --exec ${EXEC}
 
                 echo "${NAME}."
                 ;;
