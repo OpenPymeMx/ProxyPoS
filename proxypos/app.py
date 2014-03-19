@@ -165,6 +165,20 @@ def cashier_mode_deactivated():
     return
 
 
+@app.route('/pos/is_alive')
+def is_alive():
+    """
+    Test if printer is connected 
+    """
+    logger.info('Is printer alive?')
+    answer = 'ok'
+    try:
+        device = printer.device()
+    except:
+        answer = 'no'
+    return answer
+
+
 @app.route('/pos/open_cashbox')
 def open_cashbox():
     """
