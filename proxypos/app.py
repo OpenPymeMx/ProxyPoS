@@ -27,8 +27,25 @@
 import logging
 import simplejson as json
 
-from bottle import Bottle, request
-from controlers import printer
+from proxypos.bottle import Bottle, request, response
+from proxypos.controlers import printer
+
+
+# This decorator will enable bottle to automatically enable CORS
+# on all request so we could handle jquery communication
+def enable_cors(fn):
+    def _enable_cors(*args, **kwargs):
+        # set CORS headers
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = 'Origin, Accept, Content-Type, X-Requested-With, X-CSRF-Token'
+
+        if request.method != 'OPTIONS':
+            # actual request; reply with the actual response
+            return fn(*args, **kwargs)
+
+    return _enable_cors
+
 
 # Main web app
 app = Bottle()
@@ -45,7 +62,7 @@ def do_print(receipt):
         device.print_receipt(receipt)
     except (SystemExit, KeyboardInterrupt):
         raise
-    except Exception, e:
+    except Exception:
         logger.error('Failed to print receipt', exc_info=True)
 
 
@@ -126,7 +143,7 @@ def payment_request(price=None):
     The PoS will activate the method payment
     """
     logger.info("payment_request: price: %s", str(price))
-    return 'ok'
+    return json.dumps('ok')
 
 
 @app.route('/pos/payment_status')
@@ -166,16 +183,26 @@ def cashier_mode_deactivated():
 
 
 @app.route('/pos/is_alive')
+@enable_cors
 def is_alive():
     """
-    Test if printer is connected 
+    Test if printer is connected
     """
-    logger.info('Is printer alive?')
-    answer = 'ok'
+    params = dict(request.params)
+    logger.debug('Testing printer connection....')
+    result = 'ok'
     try:
-        device = printer.device()
+        printer.device()
     except:
-        answer = 'no'
+        result = 'no'
+
+    logger.debug('params: %s' % str(params))
+    # Getting jquery id
+    jquery = params['jsonp']
+    answer = '%s({"result": "%s"});' % (jquery, result)
+
+    # Set response as json
+    response.headers['Content-type'] = 'application/json'
     return answer
 
 
@@ -190,7 +217,7 @@ def open_cashbox():
         device.open_cashbox()
     except (SystemExit, KeyboardInterrupt):
         raise
-    except Exception, e:
+    except Exception:
         logger.error('Failed to open the cashbox', exc_info=True)
     return
 
