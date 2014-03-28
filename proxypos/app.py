@@ -56,14 +56,56 @@ def enableCors(fn):
 
 # Helper function to actually print the receipt
 def do_print(receipt):
-    logger.info('Print receipt %s', str(receipt))
-    try:
-        device = printer.device()
-        device.print_receipt(receipt)
-    except Exception:
-        logger.error('Failed to print receipt', exc_info=True)
+    # Import configuration
+    from proxypos import config
+
+    # Process receipt and split content if needed
+    logger.debug('Max Lines configuration: %s',
+                str(config.get('receipt.maxLines')))
+    receipts = []
+    if (config.get('receipt.maxLines') > 0 and
+        len(receipt['orderlines']) > config.get('receipt.maxLines')):
+        logger.debug('Spliting %s', receipt['orderlines'])
+        # Split orderlines in chunks
+        chunks = _chunks(receipt['orderlines'], config.get('receipt.maxLines'))
+        # Process each chunk and create new receipts
+        for chunk in chunks:
+            tmpreceipt = receipt
+            # Replacer orderlines with current chunk
+            tmpreceipt['orderlines'] = chunk
+            # Recalculate total for this chunk
+            tmpreceipt['discount'] = _total(chunk, 'discount')
+            tmpreceipt['total_without_tax'] = _total(chunk, 'price_without_tax')
+            tmpreceipt['total_with_tax'] = _total(chunk, 'price_with_tax')
+            receipts.append(tmpreceipt)
+    else:
+        receipts.append(receipt)
+
+    # Here the receipts are actually printed
+    for receipt in receipts:
+        try:
+            logger.info('Printing receipt %s', str(receipt))
+            device = printer.device()
+            device.print_receipt(receipt)
+        except Exception:
+            logger.error('Failed to print receipt', exc_info=True)
 
 
+# Helper function for split list in chunks
+def _chunks(lines, size):
+    return [lines[i:i + size] for i in range(0, len(lines), size)]
+
+
+# Helper function to recalculate totals
+def _total(lines, key):
+    from collections import Counter
+    counter = Counter()
+    for line in lines:
+        counter.update(line)
+    return counter[key]
+
+
+# This is where routes are defined for listening
 @app.route('/pos/scan_item_success')
 def scan_item_success(ean=None):
     """
@@ -231,9 +273,9 @@ def print_receipt():
         logger.debug('Params %s', str(params['r']))
         receipt = json.loads(params['r'])['params']['receipt']
         do_print(receipt)
-    except:
+    except Exception:
         # TODO: If a flag is set could delete this except
-        logger.info('Already printed receipt by POST method')
+        logger.info('Already printed receipt by POST method', exc_info=True)
     return
 
 

@@ -91,3 +91,11 @@ printer:
     pxWidth: 206
     
     charSet: \x1b\x52\x12
+    
+# Configuration for receipts
+receipt:
+
+  # This configuration allow limit product lines printed on receipt
+  # is usseful for use pre-printed receipt tickets
+  # For enable this feature change the default 0 value to any bigger value
+  maxLines: 0

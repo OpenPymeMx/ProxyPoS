@@ -41,7 +41,7 @@ def main():
     host = 'localhost'
     path = 'config/proxypos.yaml'
 
-    # Read configuration file
+    # Read configuration file and init config handler
     if os.path.exists(path):
         with open(path, 'r') as configfile:
             config.import_config(configfile.read())
