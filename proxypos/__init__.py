@@ -56,6 +56,7 @@ def setup_logging(
 def main():
     # Set default configuration
     port = '8069'
+    host = 'localhost'
     path = 'config/proxypos.yaml'
     # Start logg
     setup_logging()
@@ -67,6 +68,7 @@ def main():
         with open(path, 'rt') as f:
             config = yaml.load(f.read())
         port = config['port']
+        host = config['host']
 
-    logger.info("Listening on http://%s:%s/" % ('localhost', port))
-    run(app, host='localhost', port=port, quiet=True)
+    logger.info("Listening on http://%s:%s/" % (host, port))
+    run(app, host=host, port=port, quiet=True)

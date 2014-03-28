@@ -1,2 +1,10 @@
 ---
+# For change the host ProxyPoS is listening you can use host
+# by default ProxyPoS is listening to localhost connections only
+#
+# Use host: 0.0.0.0 for listen on all interfaces including external
+# NOTE: Make sure you don't have any firewall blocking remote connections
+
+host: localhost
+
 port: 8069
