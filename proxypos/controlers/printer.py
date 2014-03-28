@@ -25,7 +25,6 @@
 ##############################################################################
 
 import os
-import yaml
 import logging
 
 from escpos import printer
@@ -35,39 +34,28 @@ logger = logging.getLogger(__name__)
 class device:
     """ ESC/POS device object """
 
-    def __init__(
-        self,
-        default_path='config/printer.yaml',
-        env_key='LOG_CFG'
-    ):
+    def __init__(self):
         """Setup printer configuration
     
         """
-        path = default_path
-        value = os.getenv(env_key, None)
-        if value:
-            path = value
-        if os.path.exists(path):
-            with open(path, 'rt') as f:
-                self.config = yaml.load(f.read())
-            # Init printer
-            ptype = self.config['printer']['type'].lower()
-            settings = self.config['printer']['settings']
-            if ptype == 'usb':
-                self.printer = printer.Usb(settings['idVendor'], settings['idProduct'])
-            elif ptype == 'serial':
-                self.printer = printer.Serial(settings['devfile'])
-            elif ptype == 'network':
-                self.printer = printer.Network(settings['host'])
-            # Assign other default values
-            self.printer.pxWidth = settings['pxWidth']
-            # Set default widh with normal value
-            self.printer.width = self.printer.widthA = settings['WidthA']
-            self.printer.widthB = settings['WidthB']
-            # Set correc table character
-            self.printer._raw(settings['charSet'])
-        else:
-            logger.critical('Could not read printer configuration')
+        from proxypos import config
+        # Init printer
+        ptype = config.get('printer.type').lower()
+        settings = config.get('printer.settings')
+        if ptype == 'usb':
+            self.printer = printer.Usb(settings['idVendor'],
+                                       settings['idProduct'])
+        elif ptype == 'serial':
+            self.printer = printer.Serial(settings['devfile'])
+        elif ptype == 'network':
+            self.printer = printer.Network(settings['host'])
+        # Assign other default values
+        self.printer.pxWidth = settings['pxWidth']
+        # Set default widht with normal value
+        self.printer.width = self.printer.widthA = settings['WidthA']
+        self.printer.widthB = settings['WidthB']
+        # Set correct table character
+        self.printer._raw(settings['charSet'])
 
 
     def open_cashbox(self):
@@ -150,11 +138,12 @@ class device:
         string = str(date['date']) + '/' + str(date['month']) + '/' + str(date['year']) + ' ' + str(date['hour']) + ':' + "%02d" % date['minute']
         return string
 
-    def _write(self, string, rcolStr=None, align="left"):
+    def _write(self, string, rcolstr=None, align="left"):
         """Write simple text string. Remember \n for newline where applicable.
-        rcolStr is a righthand column that may be added (e.g. a price on a receipt).
-        Be aware that when rcolStr is used newline(s) may only be a part of rcolStr,
-        and only as the last character(s)."""
+        rcolstr is a righthand column that may be added
+        (e.g. a price on a receipt). Be aware that when rcolstr is
+        used newline(s) may only be a part of rcolstr, and only as
+        the last character(s)."""
         if align != "left" and len(string) < self.printer.width:
             blanks = 0
             if align == "right":
@@ -163,16 +152,16 @@ class device:
                 blanks = (self.printer.width - len(string.rstrip("\n"))) / 2
             string = " " * blanks + string
 
-        if not rcolStr:
+        if not rcolstr:
             try:
                 self.printer.text(string)
             except:
                 logger.error('No pude escribir', exc_info=1)
                 raise
         else:
-            rcolStrRstripNewline = rcolStr.rstrip("\n")
+            rcolStrRstripNewline = rcolstr.rstrip("\n")
             if "\n" in string or "\n" in rcolStrRstripNewline:
-                raise ValueError("When using rcolStr in POSprinter.write only newline at the end of rcolStr is allowed and not in string (the main text string) it self.")
+                raise ValueError("When using rcolstr in POSprinter.write only newline at the end of rcolstr is allowed and not in string (the main text string) it self.")
             # expand string
             lastLineLen = len(string) % self.printer.width + len(rcolStrRstripNewline)
             if lastLineLen > self.printer.width:
@@ -183,7 +172,7 @@ class device:
                 numOfBlanks = self.printer.width - lastLineLen
                 string += " " * numOfBlanks
             try:
-                self.printer.text(string + rcolStr)
+                self.printer.text(string + rcolstr)
             except:
                 logger.error('No pude escribir', exc_info=1)
                 raise

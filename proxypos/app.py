@@ -31,9 +31,16 @@ from proxypos.bottle import Bottle, request, response
 from proxypos.controlers import printer
 
 
+# Main web app
+app = Bottle()
+
+# Init logger
+logger = logging.getLogger(__name__)
+
+
 # This decorator will enable bottle to automatically enable CORS
 # on all request so we could handle jquery communication
-def enable_cors(fn):
+def enableCors(fn):
     def _enable_cors(*args, **kwargs):
         # set CORS headers
         response.headers['Access-Control-Allow-Origin'] = '*'
@@ -47,21 +54,12 @@ def enable_cors(fn):
     return _enable_cors
 
 
-# Main web app
-app = Bottle()
-
-# Init logger
-logger = logging.getLogger(__name__)
-
-
 # Helper function to actually print the receipt
 def do_print(receipt):
     logger.info('Print receipt %s', str(receipt))
     try:
         device = printer.device()
         device.print_receipt(receipt)
-    except (SystemExit, KeyboardInterrupt):
-        raise
     except Exception:
         logger.error('Failed to print receipt', exc_info=True)
 
@@ -183,7 +181,7 @@ def cashier_mode_deactivated():
 
 
 @app.route('/pos/is_alive')
-@enable_cors
+@enableCors
 def is_alive():
     """
     Test if printer is connected

@@ -27,30 +27,12 @@
 import os
 import logging.config
 
-import yaml
+from proxypos.bottle import run
+from proxypos.app import app
+from proxypos import kaptan
 
-from bottle import run
-from app import app
-
-
-def setup_logging(
-    default_path='config/logging.yaml',
-    default_level=logging.INFO,
-    env_key='LOG_CFG'
-):
-    """Setup logging configuration
-
-    """
-    path = default_path
-    value = os.getenv(env_key, None)
-    if value:
-        path = value
-    if os.path.exists(path):
-        with open(path, 'rt') as f:
-            config = yaml.load(f.read())
-        logging.config.dictConfig(config)
-    else:
-        logging.basicConfig(level=default_level)
+# Init config handler
+config = kaptan.Kaptan(handler="yaml")
 
 
 def main():
@@ -58,17 +40,21 @@ def main():
     port = '8069'
     host = 'localhost'
     path = 'config/proxypos.yaml'
-    # Start logg
-    setup_logging()
+
+    # Read configuration file
+    if os.path.exists(path):
+        with open(path, 'r') as configfile:
+            config.import_config(configfile.read())
+
+    # Start log file
+    logging.config.dictConfig(config.get('logs'))
+
     # Interactive mode
     logger = logging.getLogger(__name__)
     logger.info("ProxyPos server starting up...")
-
-    if os.path.exists(path):
-        with open(path, 'rt') as f:
-            config = yaml.load(f.read())
-        port = config['port']
-        host = config['host']
-
-    logger.info("Listening on http://%s:%s/" % (host, port))
-    run(app, host=host, port=port, quiet=True)
+    logger.info("Listening on http://%s:%s/" % (config.get('app.host') or host,
+                                                config.get('app.port') or port))
+    run(app,
+        host=config.get('app.host') or host,
+        port=config.get('app.port') or port,
+        quiet=True)
