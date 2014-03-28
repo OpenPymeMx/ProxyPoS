@@ -87,6 +87,8 @@ def do_print(receipt):
             logger.info('Printing receipt %s', str(receipt))
             device = printer.device()
             device.print_receipt(receipt)
+            if config.get('receipt.cutPaper'):
+                device.lineFeedCut(1, True)
         except Exception:
             logger.error('Failed to print receipt', exc_info=True)
 

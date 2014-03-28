@@ -96,6 +96,10 @@ printer:
 receipt:
 
   # This configuration allow limit product lines printed on receipt
-  # is usseful for use pre-printed receipt tickets
+  # is usseful for use pre-sized receipt tickets
   # For enable this feature change the default 0 value to any bigger value
   maxLines: 0
+  
+  # This configuration enable paper cut when receipt is printed
+  # For pre-sized tickets this must be set to false
+  cutPaper: True

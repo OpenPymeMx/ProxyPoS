@@ -36,7 +36,7 @@ class device:
 
     def __init__(self):
         """Setup printer configuration
-    
+
         """
         from proxypos import config
         # Init printer
@@ -130,7 +130,6 @@ class device:
 
         # Footer space
         self._write('GRACIAS POR SU COMPRA', '', 'center')
-        self._lineFeedCut(1, True)
 
 
     # Helper functions to facilitate printing
@@ -191,12 +190,12 @@ class device:
             except:
                 raise
 
-    def _lineFeedCut(self, times=6, cut=True):
-            """Enough line feed for the cut to be beneath the previously printed text etc."""
-            try:
-                self._lineFeed(times, cut)
-            except:
-                raise
+    def lineFeedCut(self, times=6, cut=True):
+        """Enough line feed for the cut to be beneath the previously printed text etc."""
+        try:
+            self._lineFeed(times, cut)
+        except:
+            raise
 
     def _font(self, font='a'):
         if font == 'a':
