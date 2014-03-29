@@ -55,7 +55,8 @@ class device:
         self.printer.width = self.printer.widthA = settings['WidthA']
         self.printer.widthB = settings['WidthB']
         # Set correct table character
-        self.printer._raw(settings['charSet'])
+        if settings['charSet']:
+            self.printer.text(settings['charSet'])
 
 
     def open_cashbox(self):

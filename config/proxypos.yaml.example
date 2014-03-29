@@ -86,11 +86,31 @@ printer:
     # pxWidht sets the total pixel width an is used only for
     # control the image printing for being center    
 
-    WidthA: 44
-    WidthB: 34
+    WidthA: 42
+    WidthB: 32
     pxWidth: 206
     
-    charSet: \x1b\x52\x12
+    # This allow set character table to be used by printer
+    # allowing to print special characters like latins
+    # Uncomment the one you are interested
+    # NOTE: Could be other combinations not considered here
+    #charSet: "\x1b\x74\x00" # PC437 (USA: Standard Europe)
+    #charSet: "\x1b\x74\x01" # Katakana
+    #charSet: "\x1b\x74\x02" # PC850 (Multilingual)
+    #charSet: "\x1b\x74\x03" # PC860 (Portuguese)
+    #charSet: "\x1b\x74\x04" # PC863 (Canadian-French)
+    #charSet: "\x1b\x74\x05" # PC865 (Nordic)
+    #charSet: "\x1b\x74\x16" # WPC1252
+    #charSet: "\x1b\x74\x17" # PC866 (Cyrillic #2) 
+    #charSet: "\x1b\x74\x18" # PC852 (Latin 2) 
+    #charSet: "\x1b\x74\x19" # PC858 (Euro) 
+    #charSet: "\x1b\x74\x20" # Thai character code 42
+    #charSet: "\x1b\x74\x21" # Thai character code 11
+    #charSet: "\x1b\x74\x22" # Thai character code 13
+    #charSet: "\x1b\x74\x23" # Thai character code 14
+    #charSet: "\x1b\x74\x24" # Thai character code 16
+    #charSet: "\x1b\x74\x25" # Thai character code 17
+    #charSet: "\x1b\x74\x26" # Thai character code 18
     
 # Configuration for receipts
 receipt:
