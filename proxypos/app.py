@@ -58,6 +58,7 @@ def enableCors(fn):
 def do_print(receipt):
     # Import configuration
     from proxypos import config
+    import copy
 
     # Process receipt and split content if needed
     logger.debug('Max Lines configuration: %s',
@@ -70,7 +71,7 @@ def do_print(receipt):
         chunks = _chunks(receipt['orderlines'], config.get('receipt.maxLines'))
         # Process each chunk and create new receipts
         for chunk in chunks:
-            tmpreceipt = receipt
+            tmpreceipt = copy.deepcopy(receipt)
             # Replacer orderlines with current chunk
             tmpreceipt['orderlines'] = chunk
             # Recalculate total for this chunk
