@@ -55,7 +55,7 @@ class device:
         self.printer.width = self.printer.widthA = settings['WidthA']
         self.printer.widthB = settings['WidthB']
         # Set correct table character
-        if settings['charSet']:
+        if 'charSet' in settings:
             self.printer.text(settings['charSet'])
 
 
