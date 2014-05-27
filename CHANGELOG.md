@@ -1,3 +1,7 @@
+v 1.2.0
+  - Added installer for proxypos based on @tsk ideal
+  - Moved default configuration file to user home 
+
 v 1.1.0
   - Fixed bad representation for ammounts on tickets
   - Added an option to set the charset table for deal with cases of non english characters

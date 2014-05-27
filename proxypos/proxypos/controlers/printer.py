@@ -38,7 +38,7 @@ class device:
         """Setup printer configuration
 
         """
-        from proxypos import config
+        from proxypos.proxypos import config
         # Init printer
         ptype = config.get('printer.type').lower()
         settings = config.get('printer.settings')

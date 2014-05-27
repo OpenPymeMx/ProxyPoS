@@ -27,8 +27,8 @@
 import logging
 import simplejson as json
 
-from proxypos.bottle import Bottle, request, response
-from proxypos.controlers import printer
+from proxypos.proxypos.bottle import Bottle, request, response
+from proxypos.proxypos.controlers import printer
 
 
 # Main web app
@@ -57,7 +57,7 @@ def enableCors(fn):
 # Helper function to actually print the receipt
 def do_print(receipt):
     # Import configuration
-    from proxypos import config
+    from proxypos.proxypos import config
     import copy
 
     # Process receipt and split content if needed
