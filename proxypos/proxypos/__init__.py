@@ -27,6 +27,8 @@
 import os
 import logging.config
 
+from os.path import expanduser
+
 from proxypos.proxypos.bottle import run
 from proxypos.proxypos.app import app
 from proxypos.proxypos import kaptan
@@ -39,7 +41,7 @@ def main():
     # Set default configuration
     port = '8069'
     host = 'localhost'
-    path = '~/.proxypos/config/proxypos.yaml'
+    path = expanduser("~") + '/.proxypos/config/proxypos.yaml'
 
     # Read configuration file and init config handler
     if os.path.exists(path):
