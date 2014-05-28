@@ -27,6 +27,7 @@
 import os
 import logging
 
+from os.path import expanduser
 from escpos import printer
 
 logger = logging.getLogger(__name__)
@@ -67,9 +68,7 @@ class device:
         """ Function used for print the recipt, currently is the only
         place where you can customize your printout.
         """
-        path = os.path.dirname(__file__)
-
-        filename = path + '/logo.jpg'
+        filename = expanduser("~") + '/.proxypos/templates/logo.jpg'
 
         self._printImgFromFile(filename)
 
