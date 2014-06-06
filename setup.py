@@ -27,7 +27,7 @@
 from setuptools import setup, find_packages
 
 setup(name="proxypos",
-      version="1.1.0",
+      version="1.2.0",
       description=('ECS/PoS driver for make any web Point of Sale software '
                      'interact directly with any ECS/PoS hardware locally '
                      'available'
