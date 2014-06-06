@@ -1,0 +1,125 @@
+---
+# General configuration for the entire ProxyPoS app
+
+app:
+  # For change the host ProxyPoS is listening you can use host
+  # by default ProxyPoS is listening to localhost connections only
+  #
+  # Use host: 0.0.0.0 for listen on all interfaces including external
+  # NOTE: Make sure you don't have any firewall blocking remote connections
+  host: localhost
+
+  port: 8069
+
+
+# Loggin configuration for use with ProxyPoS app
+logs:
+  version: 1
+  disable_existing_loggers: False
+  formatters:
+      simple:
+          format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  
+  handlers:
+      console:
+          class: logging.StreamHandler
+          level: DEBUG
+          formatter: simple
+          stream: ext://sys.stdout
+  
+      info_file_handler:
+          class: logging.handlers.RotatingFileHandler
+          level: INFO            
+          formatter: simple
+          filename: info.log
+          maxBytes: 10485760 # 10MB
+          backupCount: 20
+          encoding: utf8
+  
+      error_file_handler:
+          class: logging.handlers.RotatingFileHandler
+          level: ERROR            
+          formatter: simple
+          filename: errors.log
+          maxBytes: 10485760 # 10MB
+          backupCount: 20
+          encoding: utf8
+  
+  loggers:
+      main:
+          level: DEBUG
+          handlers: [console, info_file_handler, error_file_handler]
+          propagate: no
+  
+  root:
+      level: DEBUG
+      handlers: [console, info_file_handler, error_file_handler]
+
+
+# Printer configuration for use with ProxyPoS
+printer:
+  type: usb       # Uncomment this for an usb printer
+  # type: serial    # Uncomment this for a serial printer
+  # type: network   # Uncomment this for a network printer
+  settings:
+    # USB settings for communicate with printer
+    # use lsusb for get them 
+    
+    idVendor: 0x0483
+    idProduct: 0x5740
+    
+    # settings for serial printers
+    #devfile: /dev/ttyS0
+
+    # settings for network printers
+    #host: 192.168.1.99
+
+    # For propoer aligment on recipts we must set widths
+    # according to the printer specifications
+    #
+    # PoS printers are able to print on two different fonts
+    # FontA & Font B
+    # 
+    # using WidthA & WidhtB we can set the number of chars
+    # available for each font
+    #
+    # pxWidht sets the total pixel width an is used only for
+    # control the image printing for being center    
+
+    WidthA: 42
+    WidthB: 32
+    pxWidth: 206
+    
+    # This allow set character table to be used by printer
+    # allowing to print special characters like latins
+    # Uncomment the one you are interested
+    # NOTE: Could be other combinations not considered here
+    #charSet: "\x1b\x74\x00" # PC437 (USA: Standard Europe)
+    #charSet: "\x1b\x74\x01" # Katakana
+    #charSet: "\x1b\x74\x02" # PC850 (Multilingual)
+    #charSet: "\x1b\x74\x03" # PC860 (Portuguese)
+    #charSet: "\x1b\x74\x04" # PC863 (Canadian-French)
+    #charSet: "\x1b\x74\x05" # PC865 (Nordic)
+    #charSet: "\x1b\x74\x16" # WPC1252
+    #charSet: "\x1b\x74\x17" # PC866 (Cyrillic #2) 
+    #charSet: "\x1b\x74\x18" # PC852 (Latin 2) 
+    #charSet: "\x1b\x74\x19" # PC858 (Euro) 
+    #charSet: "\x1b\x74\x20" # Thai character code 42
+    #charSet: "\x1b\x74\x21" # Thai character code 11
+    #charSet: "\x1b\x74\x22" # Thai character code 13
+    #charSet: "\x1b\x74\x23" # Thai character code 14
+    #charSet: "\x1b\x74\x24" # Thai character code 16
+    #charSet: "\x1b\x74\x25" # Thai character code 17
+    #charSet: "\x1b\x74\x26" # Thai character code 18
+    
+# Configuration for receipts
+receipt:
+
+  # This configuration allow limit product lines printed on receipt
+  # is usseful for use pre-sized receipt tickets
+  # For enable this feature change the default 0 value to any bigger value
+  maxLines: 0
+  
+  # This configuration enable paper cut when receipt is printed
+  # For pre-sized tickets this must be set to false
+  cutPaper: True

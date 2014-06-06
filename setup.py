@@ -24,31 +24,7 @@
 #
 ##############################################################################
 
-import os
-
-from distutils.core import setup
-from distutils.command.install import INSTALL_SCHEMES
-
-packages, data_files = {}, []
-root_dir = os.path.dirname(__file__)
-
-if root_dir != "":
-    os.chdir(root_dir)
-proxypos_dir = "proxypos"
-
-for dirpath, dirnames, filenames in os.walk(proxypos_dir):
-    if "__init__.py" in filenames:
-        if dirpath == proxypos_dir:
-            packages[dirpath] = "."
-        else:
-            packages[dirpath.replace("/", ".")] = "./" + dirpath
-    elif filenames:
-        files = [dirpath, [os.path.join(dirpath, f) for f in filenames]]
-        data_files.append(files)
-
-
-for scheme in INSTALL_SCHEMES.values():
-    scheme['data'] = scheme['purelib']
+from setuptools import setup, find_packages
 
 setup(name="proxypos",
       version="1.1.0",
@@ -56,10 +32,17 @@ setup(name="proxypos",
                      'interact directly with any ECS/PoS hardware locally '
                      'available'
                      ),
+      long_description=open('README.md').read(),
       author="Agustin Cruz",
       author_email="agustin.cruz@openpyme.mx",
       license="MIT",
       scripts=["proxypos/proxypos-server"],
-      packages=packages,
-      data_files=data_files,
+      packages=find_packages(),
+      data_files=[('config', ['config/proxypos.yaml.example'])
+                  ],
+      install_requires=['simplejson',
+                        'qrcode',
+                        'pyyaml',
+                        'pyserial',
+                        ],
 )
