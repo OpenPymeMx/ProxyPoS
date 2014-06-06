@@ -31,7 +31,7 @@ logs:
           class: logging.handlers.RotatingFileHandler
           level: INFO            
           formatter: simple
-          filename: info.log
+          filename: /var/log/proxypos/info.log
           maxBytes: 10485760 # 10MB
           backupCount: 20
           encoding: utf8
@@ -40,7 +40,7 @@ logs:
           class: logging.handlers.RotatingFileHandler
           level: ERROR            
           formatter: simple
-          filename: errors.log
+          filename: /var/log/proxypos/error.log
           maxBytes: 10485760 # 10MB
           backupCount: 20
           encoding: utf8
