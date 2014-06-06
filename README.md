@@ -4,7 +4,7 @@ ProsyPoS is a software to use as a driver for PoS devices to use with OpenERP Po
 It is on early development status, we are going to continue workgint on it
 as our customer required. 
 
-If you need a feature that is not currently supported, contactme at atin81@gmail.com
+If you need a feature that is not currently supported, contactme at agustin.cruz@openpyme.mx
 and consider make a donation for speed up development process.
 
 All contributions are welcome, just see Contributing section for general guide lines.
