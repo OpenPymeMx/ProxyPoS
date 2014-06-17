@@ -24,10 +24,7 @@
 #
 ##############################################################################
 
-import os
 import logging
-
-from os.path import expanduser
 from escpos import printer
 
 logger = logging.getLogger(__name__)
@@ -39,6 +36,7 @@ class device:
         """Setup printer configuration
 
         """
+        # Import configuration handler
         from proxypos.proxypos import config
         # Init printer
         ptype = config.get('printer.type').lower()
@@ -68,68 +66,14 @@ class device:
         """ Function used for print the recipt, currently is the only
         place where you can customize your printout.
         """
-        filename = expanduser("~") + '/.proxypos/templates/logo.jpg'
+        # Import configuration handler
+        from proxypos.proxypos import config
+        from proxypos.proxypos import tmphandler
 
-        self._printImgFromFile(filename)
+        template = config.get('receipt.template')
 
-        date = self._format_date(receipt['date'])
-        self._bold(False)
-        self._font('a')
-        self._lineFeed(1)
-        self._write(date, None, 'right')
-        self._lineFeed(1)
-        self._write(receipt['name'] + '\n', '', 'right')
-
-        self._write(receipt['company']['name'] + '\n')
-        self._write('RFC: ' + str(receipt['company']['company_registry']) + '\n')
-        self._write(str(receipt['company']['contact_address']) + '\n')
-        self._write('Telefono: ' + str(receipt['company']['phone']) + '\n')
-        self._write('Cajero: ' + str(receipt['cashier']) + '\n')
-        # self._write('Tienda: ' + receipt['store']['name'])
-        self._lineFeed(1)
-        for line in receipt['orderlines']:
-            left = ' '.join([str(line['quantity']),
-                             line['unit_name'],
-                             line['product_name']
-                            ]).encode('utf-8')
-            right = self._decimal(line['price_with_tax'])
-            self._write(left, right)
-            self._lineFeed(1)
-
-        self._lineFeed(2)
-        self._write('Subtotal:', self._decimal(receipt['total_without_tax']) + '\n')
-        self._write('IVA:', self._decimal(receipt['total_tax']) + '\n')
-        self._write('Descuento:', self._decimal(receipt['total_discount']) + '\n')
-        self._bold(True)
-        self._font('b')
-        self._write('TOTAL:', '$' + self._decimal(receipt['total_with_tax']) + '\n')
-
-        # Set space for display payment methods
-        self._lineFeed(1)
-        self._font('a')
-        self._bold(False)
-        paymentlines = receipt['paymentlines']
-        if paymentlines:
-            for payment in paymentlines:
-                self._write(payment['journal'], self._decimal(payment['amount']))
-
-            self._bold(True)
-            self._write('Cambio:', '$ ' + self._decimal(receipt['change']))
-            self._bold(False)
-
-        # Write customer data
-        client = receipt['client']
-        if client:
-            self._lineFeed(4)
-            self._write('Cliente: ' + client['name'].encode('utf-8'))
-            self._lineFeed(1)
-            self._write((u'Teléfono: ' + client['phone']).encode('utf-8'))
-            self._lineFeed(1)
-            self._write('Dirección: ' + client['contact_address'].encode('utf-8'))
-            self._lineFeed(1)
-
-        # Footer space
-        self._write('GRACIAS POR SU COMPRA', '', 'center')
+        # Render and print receipt
+        tmphandler.print_receipt(self, template, receipt)
 
 
     # Helper functions to facilitate printing

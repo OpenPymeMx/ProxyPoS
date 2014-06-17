@@ -32,9 +32,13 @@ from os.path import expanduser
 from proxypos.proxypos.bottle import run
 from proxypos.proxypos.app import app
 from proxypos.proxypos import kaptan
+from proxypos.proxypos import templates
 
 # Init config handler
 config = kaptan.Kaptan(handler="yaml")
+
+# Init templates handler
+tmphandler = templates.Template(expanduser("~") + '/.proxypos/templates')
 
 
 def main():

@@ -44,5 +44,6 @@ setup(name="proxypos",
                         'qrcode',
                         'pyyaml',
                         'pyserial',
+                        'jinja2',
                         ],
 )

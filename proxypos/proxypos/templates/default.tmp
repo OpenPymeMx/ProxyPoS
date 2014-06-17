@@ -1,0 +1,53 @@
+{# Header Section #}
+logo
+{{bold(False)}}
+{{font('a')}}
+{{write("\n"+formatdate(date)+"\n",None,'left')}}
+{{write(order_name+"\n",'','left')}}
+
+{{write(company_name + '\n')}}
+{{write('RFC: ' + str(company_registry) + '\n')}}
+{{write('Telefono: ' + str(company_phone) + '\n')}}
+{{write('Cajero: ' + cashier + '\n')}}
+{{linefeed(1)}}
+{# Order section #}
+{% for line in orderlines %}
+{% set left = ' '.join([str(line['quantity']),
+                             line['unit_name'],
+                             line['product_name']
+                            ]).encode('utf-8')
+%}
+{% set right =  decimal(line['price_with_tax'])%}
+{{write(left,right)}}
+{{linefeed(1)}}
+{% endfor %}
+{{linefeed(2)}}
+{{write('Subtotal:', decimal(total_without_tax) + '\n')}}
+{{write('IVA:', decimal(total_tax) + '\n')}}
+{{write('Descuento:', decimal(total_discount) + '\n')}}
+{{bold(True)}}
+{{write('TOTAL:', '$' + decimal(total_with_tax) + '\n')}}
+{{linefeed(1)}}
+{{font('a')}}
+{{bold(False)}}
+
+{% for payment in paymentlines %}
+{{write(payment['journal'], decimal(payment['amount'])+'\n')}}
+{% endfor %}}
+
+{{bold(True)}}
+{{write('Cambio:', '$ ' + decimal(change)+'\n')}}
+{{bold(False)}}
+{% if client %}
+{{write('Cliente: ' + client['name'].encode('utf-8'))}}
+{% endif %}
+
+{# Footer #}
+
+{{write('Recibo sin validez fiscal.\n', '', 'left')}}
+{{write('Si requiere factura, solicitarla dentro de los proximos 5 dias','','left')}}
+{{write('\n'+str(company_website)+'\n','','left')}}
+{{write('\n'+str(company_email)+'\n','','left')}}
+{{barcode(order_name[6:],'EAN13',64,2,'BELOW','A')}}
+
+{{cut(1,True)}}
