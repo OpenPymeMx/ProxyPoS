@@ -38,7 +38,7 @@ setup(name="proxypos",
       license="MIT",
       scripts=["proxypos/proxypos-server"],
       packages=find_packages(),
-      data_files=[('config', ['config/proxypos.yaml.example'])
+      data_files=[('config', ['config/proxypos.yaml'])
                   ],
       install_requires=['simplejson',
                         'qrcode',

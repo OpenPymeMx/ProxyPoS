@@ -52,18 +52,21 @@ mapping = {
     "total_with_tax": lambda r: r["total_with_tax"],
     "subtotal": lambda r: r['subtotal'],
     "change": lambda r: r['change'],
+    "nineteen_tax": lambda r: r['nineteen_tax'],
+    "seven_tax": lambda r: r['seven_tax'],
 }
 
 txt_function_mapping = {
-    'image': lambda printer: printer._printImgFromFile,
-    'font': lambda printer: printer._font,
-    'bold': lambda printer: printer._bold,
-    'linefeed': lambda printer: printer._lineFeed,
-    'write': lambda printer: printer._write,
-    'formatdate': lambda printer: printer._format_date,
+    # 'image': lambda printer: printer.printImgFromFile,
+    'image': lambda printer: printer.image,
+    'font': lambda printer: printer.font,
+    'bold': lambda printer: printer.bold,
+    'linefeed': lambda printer: printer.lineFeed,
+    'write': lambda printer: printer.write,
+    'formatdate': lambda printer: printer.format_date,
     'cut':lambda printer: printer.lineFeedCut,
-    'decimal': lambda printer: printer._decimal,
-    'barcode': lambda printer: printer.printer.barcode,
+    'decimal': lambda printer: printer.decimal,
+    'barcode': lambda printer: printer.barcode,
 }
 
 

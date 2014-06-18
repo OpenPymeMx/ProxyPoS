@@ -86,10 +86,7 @@ def do_print(receipt):
     for receipt in receipts:
         try:
             logger.info('Printing receipt %s', str(receipt))
-            device = printer.device()
-            device.print_receipt(receipt)
-            if config.get('receipt.cutPaper'):
-                device.lineFeedCut(1, True)
+            printer.print_receipt(receipt)
         except Exception:
             logger.error('Failed to print receipt', exc_info=True)
 
@@ -225,30 +222,6 @@ def cashier_mode_deactivated():
     return
 
 
-@app.route('/pos/is_alive')
-@enableCors
-def is_alive():
-    """
-    Test if printer is connected
-    """
-    params = dict(request.params)
-    logger.debug('Testing printer connection....')
-    result = 'ok'
-    try:
-        printer.device()
-    except:
-        result = 'no'
-
-    logger.debug('params: %s' % str(params))
-    # Getting jquery id
-    jquery = params['jsonp']
-    answer = '%s({"result": "%s"});' % (jquery, result)
-
-    # Set response as json
-    response.headers['Content-type'] = 'application/json'
-    return answer
-
-
 @app.route('/pos/open_cashbox')
 def open_cashbox():
     """
@@ -256,8 +229,7 @@ def open_cashbox():
     """
     logger.info('open_cashbox')
     try:
-        device = printer.device()
-        device.open_cashbox()
+        printer.open_cashbox()
     except (SystemExit, KeyboardInterrupt):
         raise
     except Exception:

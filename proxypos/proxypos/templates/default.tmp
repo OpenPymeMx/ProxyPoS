@@ -1,5 +1,5 @@
 {# Header Section #}
-logo
+{{image('logo.jpg')}}
 {{bold(False)}}
 {{font('a')}}
 {{write("\n"+formatdate(date)+"\n",None,'left')}}
