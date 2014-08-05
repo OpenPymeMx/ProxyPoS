@@ -15,7 +15,7 @@
 {% set left = ' '.join([str(line['quantity']),
                              line['unit_name'],
                              line['product_name']
-                            ]).encode('utf-8')
+                            ])
 %}
 {% set right =  decimal(line['price_with_tax'])%}
 {{write(left,right)}}

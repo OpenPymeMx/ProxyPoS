@@ -271,3 +271,17 @@ def print_receipt_post():
 def print_pdf_invoice():
     logger.info('print_pdf_invoice')
     return
+
+
+@app.route('/pos/is_alive')
+def is_alive():
+    """
+    Test if printer is connected
+    """
+    logger.info('Is printer alive?')
+    answer = 'ok'
+    try:
+        printer.is_alive()
+    except:
+        answer = 'no'
+    return answer
