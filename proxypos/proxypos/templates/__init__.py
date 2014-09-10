@@ -52,8 +52,6 @@ mapping = {
     "total_with_tax": lambda r: r["total_with_tax"],
     "subtotal": lambda r: r['subtotal'],
     "change": lambda r: r['change'],
-    "nineteen_tax": lambda r: r['nineteen_tax'],
-    "seven_tax": lambda r: r['seven_tax'],
 }
 
 txt_function_mapping = {
