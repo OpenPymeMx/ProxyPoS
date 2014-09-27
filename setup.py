@@ -26,24 +26,28 @@
 
 from setuptools import setup, find_packages
 
-setup(name="proxypos",
-      version="1.1.0",
-      description=('ECS/PoS driver for make any web Point of Sale software '
-                     'interact directly with any ECS/PoS hardware locally '
-                     'available'
-                     ),
-      long_description=open('README.md').read(),
-      author="Agustin Cruz",
-      author_email="agustin.cruz@openpyme.mx",
-      license="MIT",
-      scripts=["proxypos/proxypos-server"],
-      packages=find_packages(),
-      data_files=[('config', ['config/proxypos.yaml'])
-                  ],
-      install_requires=['simplejson',
-                        'qrcode',
-                        'pyyaml',
-                        'pyserial',
-                        'jinja2',
-                        ],
+setup(
+    name="proxypos",
+    version="1.1.0",
+    description=(
+        'ECS/PoS driver for make any web Point of Sale software '
+        'interact directly with any ECS/PoS hardware locally '
+        'available'
+    ),
+    long_description=open('README.md').read(),
+    author="Agustin Cruz",
+    author_email="agustin.cruz@openpyme.mx",
+    license="MIT",
+    scripts=["proxypos/proxypos-server"],
+    packages=find_packages(),
+    # data_files=[
+    #    ('config', ['config/proxypos.yaml'])
+    # ],
+    install_requires=[
+        'simplejson',
+        'qrcode',
+        'pyyaml',
+        'pyserial',
+        'jinja2',
+    ],
 )
